@@ -53,6 +53,72 @@ HanaAgent 是一个更加易用的 AI agent，有记忆，有性格，会主动�
 **移动端与 LAN 前端** — HanaAgent Server 可以托管 `/mobile/` PWA，手机通过设备访问密钥或本地账号登录，查看会话、继续聊天和管理工作台文件。另一台桌面端也可以通过 LAN URL + access key 连接到已有 HanaAgent Server，继续消费同一套会话和资源。
 
 
+## 快速开始
+
+### 环境要求
+
+- **Node.js** >= 24.12.0 < 25
+- **npm** (随 Node.js 一起安装)
+
+### 安装
+
+```bash
+# 克隆仓库
+git clone https://github.com/liliMozi/openhanako.git
+cd openhanako
+
+# 安装依赖
+npm install
+```
+
+### 运行
+
+```bash
+# 启动桌面应用（生产模式）
+npm start
+
+# 启动桌面应用（开发模式，支持热更新）
+npm run start:dev
+
+# 仅启动 Web 开发服务器
+npm run dev:web
+
+# 启动后端服务器
+npm run server
+
+# 使用 CLI 模式
+npm run cli
+```
+
+### 构建
+
+```bash
+# 构建客户端（包含主进程、预加载脚本、渲染器和主题）
+npm run build:client
+
+# 构建服务器
+npm run build:server
+
+# 构建所有 packages
+npm run build:packages
+
+# 打包为可分发的应用
+npm run pack         # macOS
+npm run dist:win     # Windows
+npm run dist:linux   # Linux
+```
+
+### 测试
+
+```bash
+# 运行测试
+npm test
+
+# 监听模式运行测试
+npm run test:watch
+```
+
+
 ## 截图
 
 <p align="center">
