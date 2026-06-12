@@ -10,10 +10,6 @@
 
 <p align="center">一个有记忆、有灵魂的私人 AI 助理</p>
 
-<p align="center"><a href="README_EN.md">English</a></p>
-
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)](https://github.com/liliMozi/openhanako/releases)
 
 ---
 
@@ -24,10 +20,7 @@ HanaAgent 是一个更加易用的 AI agent，有记忆，有性格，会主动�
 作为助手，Ta 是温柔的：不需要写复杂的配置，不需要理解晦涩的术语。HanaAgent 它不只面向 coder ，而是为每一个坐在电脑前工作的人设计的助手。
 作为工具，Ta 是强大的：记住你说过的每一件事，操作你的电脑，浏览网页，搜索信息，读写文件，执行代码，管理日程，还能自主学习新技能。
 
-我开这个项目的初衷是：弥合绝大多数人和 AI Agent 之间的缝隙，让强大的 Agent 能力不再只局限于命令行里。于是我做了比传统 Coding Agent 更多一些的优化：一方面是强化 Agent「像人」的属性，是你和他们沟通更自然；另一方面，因为我本职也是一介文员，所以我也针对日常办公场景做了很多工具性和流程性的优化，敬请探索。
-此外，HanaAgent 有比较完备的图形页面。
 
-如果你用过 claude code、codex、Manus 等 CLI 或是图形化的 Agent，你会在 HanaAgent 这里找到熟悉又新奇的感觉。
 
 ## 功能特性
 
@@ -59,7 +52,6 @@ HanaAgent 是一个更加易用的 AI agent，有记忆，有性格，会主动�
 
 **移动端与 LAN 前端** — HanaAgent Server 可以托管 `/mobile/` PWA，手机通过设备访问密钥或本地账号登录，查看会话、继续聊天和管理工作台文件。另一台桌面端也可以通过 LAN URL + access key 连接到已有 HanaAgent Server，继续消费同一套会话和资源。
 
-**国际化** — 界面支持中文、英文、日文、韩文、繁体中文 5 种语言。
 
 ## 截图
 
@@ -67,108 +59,3 @@ HanaAgent 是一个更加易用的 AI agent，有记忆，有性格，会主动�
   <img src=".github/assets/screenshot-main.jpg" width="100%" alt="HanaAgent 主界面">
 </p>
 
-## 快速开始
-
-### 下载安装
-
-**macOS（Apple Silicon / Intel）**：从 [Releases](https://github.com/liliMozi/openhanako/releases) 下载最新 `.dmg`。
-
-应用已通过 Apple Developer ID 签名和公证，macOS 应该可以直接打开。
-
-**Windows**：从 [Releases](https://github.com/liliMozi/openhanako/releases) 下载最新 `.exe` 安装包。
-
-> **Windows SmartScreen 提示：** 安装包暂未经过代码签名，首次运行时 Windows Defender SmartScreen 可能会拦截，点击**更多信息** → **仍要运行**即可，未签名版本的正常现象。
-
-**Linux**：从 [Releases](https://github.com/liliMozi/openhanako/releases) 下载最新 `.AppImage` 或 `.deb`。
-
-### 首次运行
-
-首次启动时，引导向导会带你完成配置：选择语言、输入你的名字、连接模型提供商（API key + base URL），并选择三个模型：**对话模型**（主对话）、**小工具模型**（轻量任务）、**大工具模型**（记忆编译和深度分析）。设置页还可以单独选择**视觉模型**，让文本模型通过 Vision Bridge 处理图片附件。HanaAgent 支持 OpenAI 兼容、Anthropic 风格、OAuth Provider 和 Ollama 本地模型等多类接入。
-目前也添加了 OpenAI 的 OAuth 登录，鉴于 Anthropic 会有封号风险，所以暂时不提供。
-
-## 架构
-
-```
-core/           引擎编排层 + Manager（含 PluginManager）
-lib/            核心库（记忆、工具、沙盒、Bridge 适配器）
-server/         Hono HTTP + WebSocket 服务（独立 Node.js 进程）
-hub/            调度器、频道路由、事件总线
-desktop/        Electron 应用 + React 前端
-shared/         跨层共享工具（config schema、error bus、模型引用等）
-plugins/        内置系统插件（随应用打包）
-skills2set/     内置技能定义
-scripts/        构建工具（server 打包、启动器、签名）
-tests/          Vitest 测试
-```
-
-引擎层协调多个 Manager（Agent、Session、Model、Preferences、Skill、Channel、BridgeSession、Plugin 等），通过统一的 facade 暴露。Hub 负责后台任务（心跳巡检、自动化 / 定时任务、频道路由、Agent 间通信、DM 路由），独立于当前聊天会话运行。
-
-Session 内的用户可见文件通过 `SessionFile` sidecar 统一登记，桌面端、Bridge、Mobile PWA 和其它远程前端按各自能力消费同一份文件身份。Bridge 平台媒体发送规则见 `.docs/BRIDGE-MEDIA-CAPABILITIES.md`，插件文件贡献规则见 `PLUGINS.md`。
-
-本机 staged 文件优先由各平台 adapter 直接上传：Telegram / 飞书 / 微信走各自上传接口，QQ 走官方 Bot 分片上传接口，再发送 `msg_type: 7` 富媒体消息。`preferences.bridge.mediaPublicBaseUrl` / `HANA_BRIDGE_PUBLIC_BASE_URL` 只用于仍需公网 URL 的平台或远程 fallback；该 URL 作为 `/api/bridge/media/:token` 临时文件路由的 origin，文件本身仍由短期 token、下载次数和本地路径白名单保护。Hana 不会自动开启公网 tunnel，公网入口必须由用户显式提供。
-
-Server 以独立 Node.js 进程运行（由 Electron spawn 或独立启动），通过 Vite 打包，@vercel/nft 追踪依赖。与 Electron 渲染进程通过 WebSocket 通信。
-用户数据目录由 `HANA_HOME` 决定（生产默认 `~/.hanako`，开发默认 `~/.hanako-dev`）。Pi SDK 自己的数据隔离在 `${HANA_HOME}/.pi/` 下。
-
-## 技术栈
-
-| 层级 | 技术 |
-|------|------|
-| 桌面端 | Electron 42 |
-| 前端 | React 19 + Zustand 5 + CSS Modules |
-| 构建 | Vite 7 |
-| 服务端 | Hono + @hono/node-server |
-| Agent 运行时 | [Pi SDK](https://github.com/badlogic/pi-mono) |
-| 数据库 | better-sqlite3（WAL 模式） |
-| 测试 | Vitest |
-| 国际化 | 5 语言（zh / en / ja / ko / zh-TW） |
-
-## 平台支持
-
-| 平台 | 状态 |
-|------|------|
-| macOS (Apple Silicon) | 已支持（已签名公证） |
-| macOS (Intel) | 已支持 |
-| Windows | Beta |
-| Linux | 已支持（AppImage / deb） |
-| 移动端 (PWA) | v0：同一 HanaAgent Server 的手机会话与工作台访问 |
-
-## 开发
-
-```bash
-# 安装依赖
-npm install
-
-# Electron 启动（自动构建 renderer）
-npm start
-
-# Vite HMR 开发（需先运行 npm run dev:renderer）
-npm run start:vite
-
-# 仅启动 server
-npm run server
-
-# server-first CLI
-npm run cli
-
-# 运行测试
-npm test
-
-# 类型检查
-npm run typecheck
-```
-
-## 许可证
-
-[Apache License 2.0](LICENSE)
-
-## 链接
-
-> 仓库和 release 地址在当前迁移阶段仍保留旧的 `openhanako` URL，后续仓库 rename 会单独执行。
-
-- [官网](https://openhanako.com)
-- [提交 Issue](https://github.com/liliMozi/openhanako/issues)
-- [安全页](https://github.com/liliMozi/openhanako/security)
-- [安全政策](SECURITY.md)
-- [插件开发指南](PLUGINS.md)
-- [贡献指南](CONTRIBUTING.md)
