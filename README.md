@@ -55,7 +55,7 @@ HanaAgent 是一个更加易用的 AI agent，有记忆，有性格，会主动�
 
 ## 快速开始
 
-### 点击release按钮下载.exe
+### 点击release按钮下载.exe:https://github.com/kunkun65721/Hanako/releases/download/v3/HanaAgent-0.309.2-Windows-x64.exe
 
 
 
